@@ -1,26 +1,39 @@
 {
+  "$schema": "https://json.repomix.com/schema.json",
   "output": {
     "filePath": "beaconai_context.xml",
     "style": "xml",
+    "headerText": "BeaconAI: AI-powered desktop voice assistant for visually impaired users.\nArchitecture: Flutter Monorepo (Very Good CLI pattern) with local packages in packages/ and UI features in lib/.",
     "removeComments": false,
-    "showLineNumbers": true
+    "showLineNumbers": true,
+    "topFiles": [
+      "pubspec.yaml",
+      "lib/bootstrap.dart",
+      "lib/main_development.dart",
+      "lib/app/view/app.dart",
+      "packages/assistant_repository/lib/src/assistant_repository.dart",
+      "packages/assistant_repository/lib/assistant_repository.dart"
+    ]
   },
   "ignore": {
     "useGitignore": true,
     "useDefaultPatterns": true,
     "customPatterns": [
-      "build/",
-      ".dart_tool/",
-      ".idea/",
+      "**/build/",
+      "**/.dart_tool/",
+      "**/.idea/",
+      "**/.vscode/",
       "**/*.g.dart",
       "**/*.freezed.dart",
       "**/*.mocks.dart",
+      "**/*.lock",
       "windows/flutter/ephemeral/",
       "windows/runner/Debug/",
       "windows/runner/Release/",
       "*.iml",
       ".metadata",
-      "beaconai_context.xml"
+      "beaconai_context.xml",
+      "repomix-output.xml"
     ]
   }
 }

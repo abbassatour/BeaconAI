@@ -1,6 +1,8 @@
-import 'package:temp_app/app/app.dart';
-import 'package:temp_app/bootstrap.dart';
+// lib/main_development.dart
 
-Future<void> main() async {
-  await bootstrap(() => const App());
+import 'app/view/app.dart';
+import 'bootstrap.dart';
+
+void main() {
+  bootstrap((repository) => App(assistantRepository: repository));
 }

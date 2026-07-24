@@ -1,8 +1,14 @@
+// lib/bootstrap.dart
+
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:ai_agent_api/ai_agent_api.dart';
+import 'package:assistant_repository/assistant_repository.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/widgets.dart';
+import 'package:os_automation_api/os_automation_api.dart';
+import 'package:speech_api/speech_api.dart';
 
 class AppBlocObserver extends BlocObserver {
   const AppBlocObserver();
@@ -20,14 +26,27 @@ class AppBlocObserver extends BlocObserver {
   }
 }
 
-Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
+Future<void> bootstrap(FutureOr<Widget> Function(AssistantRepository) builder) async {
   FlutterError.onError = (details) {
     log(details.exceptionAsString(), stackTrace: details.stack);
   };
 
   Bloc.observer = const AppBlocObserver();
 
-  // Add cross-flavor configuration here
+  // إعداد كل الـ APIs والمستودع قبل تشغيل التطبيق باستخدام المفتاح الخاص بك
+  final aiClient = AiAgentClient(apiKey: 'AIzaSyAm-OSoQuq6TmIHmrs8RuBn42hrON8UdDE');
+  final processManager = OsProcessManager();
+  final keyboardController = KeyboardController();
+  final ttsService = TtsService();
+  final sttService = SttService();
 
-  runApp(await builder());
+  final repository = AssistantRepository(
+    aiClient: aiClient,
+    processManager: processManager,
+    keyboardController: keyboardController,
+    ttsService: ttsService,
+    sttService: sttService,
+  );
+
+  runApp(await builder(repository));
 }

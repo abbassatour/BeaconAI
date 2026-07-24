@@ -1,22 +1,27 @@
+// lib/app/view/app.dart
+
 import 'package:flutter/material.dart';
-import 'package:temp_app/counter/counter.dart';
-import 'package:temp_app/l10n/l10n.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:assistant_repository/assistant_repository.dart';
+import '../../voice_assistant/cubit/voice_assistant_cubit.dart';
+import '../../voice_assistant/view/voice_assistant_page.dart';
 
 class App extends StatelessWidget {
-  const App({super.key});
+  const App({required this.assistantRepository, super.key});
+
+  final AssistantRepository assistantRepository;
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        appBarTheme: AppBarTheme(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+    return RepositoryProvider.value(
+      value: assistantRepository,
+      child: BlocProvider(
+        create: (context) => VoiceAssistantCubit(repository: assistantRepository),
+        child: const MaterialApp(
+          debugShowCheckedModeBanner: false,
+          home: VoiceAssistantPage(),
         ),
-        useMaterial3: true,
       ),
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      home: const CounterPage(),
     );
   }
 }
