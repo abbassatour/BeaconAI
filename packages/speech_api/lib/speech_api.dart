@@ -1,5 +1,6 @@
-/// A Calculator.
-class Calculator {
-  /// Returns [value] plus 1.
-  int addOne(int value) => value + 1;
-}
+// packages/speech_api/lib/speech_api.dart
+
+library speech_api;
+
+export 'src/stt/stt_service.dart';
+export 'src/tts/tts_service.dart';

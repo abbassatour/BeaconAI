@@ -1,0 +1,26 @@
+{
+  "output": {
+    "filePath": "beaconai_context.xml",
+    "style": "xml",
+    "removeComments": false,
+    "showLineNumbers": true
+  },
+  "ignore": {
+    "useGitignore": true,
+    "useDefaultPatterns": true,
+    "customPatterns": [
+      "build/",
+      ".dart_tool/",
+      ".idea/",
+      "**/*.g.dart",
+      "**/*.freezed.dart",
+      "**/*.mocks.dart",
+      "windows/flutter/ephemeral/",
+      "windows/runner/Debug/",
+      "windows/runner/Release/",
+      "*.iml",
+      ".metadata",
+      "beaconai_context.xml"
+    ]
+  }
+}
