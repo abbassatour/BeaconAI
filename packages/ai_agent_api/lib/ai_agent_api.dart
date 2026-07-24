@@ -1,5 +1,6 @@
-/// A Calculator.
-class Calculator {
-  /// Returns [value] plus 1.
-  int addOne(int value) => value + 1;
-}
+// packages/ai_agent_api/lib/ai_agent_api.dart
+
+library ai_agent_api;
+
+export 'src/ai_agent_client.dart';
+export 'src/models/agent_action.dart';
