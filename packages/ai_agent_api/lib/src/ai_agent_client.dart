@@ -1,4 +1,5 @@
 // packages/ai_agent_api/lib/src/ai_agent_client.dart
+import 'dart:io';
 
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'models/agent_action.dart';
@@ -45,6 +46,43 @@ class AiAgentClient {
         }, requiredProperties: ['key_name']),
       ),
     ]);
+  }
+
+    /// إرسال ملف صوتي للذكاء الاصطناعي لاستخراج الأوامر
+  Future<List<AgentAction>> processAudioCommand(String audioPath) async {
+    final bytes = await File(audioPath).readAsBytes();
+    
+    // إرسال الصوت مع تعليمة بسيطة
+    final prompt = TextPart('استمع إلى هذا التسجيل الصوتي من المستخدم، ونفذ الأمر المطلوب باستخدام الأدوات (Tools) المتاحة لك.');
+    final audioPart = DataPart('audio/mp4', bytes); // صيغة m4a تعامل كـ mp4 audio
+
+    final chat = _model.startChat();
+    final response = await chat.sendMessage(Content.multi([prompt, audioPart]));
+
+    return _extractActionsFromResponse(response);
+  }
+
+  // قمت بفصل منطق استخراج الأدوات في دالة منفصلة لمنع التكرار
+  List<AgentAction> _extractActionsFromResponse(GenerateContentResponse response) {
+    final actions = <AgentAction>[];
+    final functionCalls = response.functionCalls.toList();
+    
+    for (final call in functionCalls) {
+      switch (call.name) {
+        case 'open_app':
+          actions.add(AgentAction(type: ActionType.openApp, parameters: call.args));
+          break;
+        case 'type_text':
+          actions.add(AgentAction(type: ActionType.typeText, parameters: call.args));
+          break;
+        case 'press_key':
+          actions.add(AgentAction(type: ActionType.pressKey, parameters: call.args));
+          break;
+        default:
+          actions.add(AgentAction(type: ActionType.unknown, parameters: call.args));
+      }
+    }
+    return actions;
   }
 
   /// إرسال أمر المستخدم للذكاء الاصطناعي واستقبال قائمة الأفعال (Actions)

@@ -7,7 +7,7 @@ import 'package:ai_agent_api/ai_agent_api.dart';
 import 'package:assistant_repository/assistant_repository.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/widgets.dart';
-import 'package:os_automation_api/os_automation_api.dart';
+import 'package:os_automation_api/os_automation_api.dart'; // هذا السطر جديد
 import 'package:speech_api/speech_api.dart';
 
 class AppBlocObserver extends BlocObserver {
@@ -33,8 +33,15 @@ Future<void> bootstrap(FutureOr<Widget> Function(AssistantRepository) builder) a
 
   Bloc.observer = const AppBlocObserver();
 
-  // إعداد كل الـ APIs والمستودع قبل تشغيل التطبيق باستخدام المفتاح الخاص بك
-  final aiClient = AiAgentClient(apiKey: 'AIzaSyAm-OSoQuq6TmIHmrs8RuBn42hrON8UdDE');
+  const geminiApiKey = String.fromEnvironment('GEMINI_API_KEY');
+
+  if (geminiApiKey.isEmpty) {
+    throw Exception(
+      'GEMINI_API_KEY is missing! Please run the app with --dart-define-from-file=.env',
+    );
+  }
+
+  final aiClient = AiAgentClient(apiKey: geminiApiKey);
   final processManager = OsProcessManager();
   final keyboardController = KeyboardController();
   final ttsService = TtsService();

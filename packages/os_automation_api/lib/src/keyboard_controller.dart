@@ -34,13 +34,11 @@ class KeyboardController {
 
     // حدث ضغط الزر (Key Down)
     inputs[0].type = INPUT_KEYBOARD;
-    inputs[0].ki.wVk = 0;
     inputs[0].ki.wScan = charCode;
     inputs[0].ki.dwFlags = KEYEVENTF_UNICODE;
 
     // حدث إفلات الزر (Key Up)
     inputs[1].type = INPUT_KEYBOARD;
-    inputs[1].ki.wVk = 0;
     inputs[1].ki.wScan = charCode;
     inputs[1].ki.dwFlags = KEYEVENTF_UNICODE | KEYEVENTF_KEYUP;
 
@@ -49,19 +47,17 @@ class KeyboardController {
   }
 
   /// دالة داخلية للضغط على أزرار النظام (Virtual Keys)
-  void _sendVirtualKey(int keyCode) {
+  /// لاحظ أننا نمرر VIRTUAL_KEY بدلاً من int
+  void _sendVirtualKey(VIRTUAL_KEY keyCode) {
     final inputs = calloc<INPUT>(2);
 
     // Key Down
     inputs[0].type = INPUT_KEYBOARD;
     inputs[0].ki.wVk = keyCode;
-    inputs[0].ki.wScan = 0;
-    inputs[0].ki.dwFlags = 0;
 
     // Key Up
     inputs[1].type = INPUT_KEYBOARD;
     inputs[1].ki.wVk = keyCode;
-    inputs[1].ki.wScan = 0;
     inputs[1].ki.dwFlags = KEYEVENTF_KEYUP;
 
     SendInput(2, inputs, sizeOf<INPUT>());

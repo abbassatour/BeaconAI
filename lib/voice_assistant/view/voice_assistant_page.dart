@@ -13,10 +13,11 @@ class VoiceAssistantPage extends StatelessWidget {
     final TextEditingController controller = TextEditingController();
 
     return Scaffold(
-      backgroundColor: Colors.black, // خلفية داكنة مريحة للعين
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text('BeaconAI - المساعد الذكي', style: TextStyle(color: Colors.white)),
+        title: const Text('BeaconAI', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.grey[900],
+        centerTitle: true,
       ),
       body: Center(
         child: Padding(
@@ -24,7 +25,6 @@ class VoiceAssistantPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // مؤشر الحالة (يتغير لونه وشكله حسب حالة المساعد)
               BlocBuilder<VoiceAssistantCubit, VoiceAssistantState>(
                 builder: (context, state) {
                   IconData icon;
@@ -35,89 +35,95 @@ class VoiceAssistantPage extends StatelessWidget {
                     case AssistantStatus.idle:
                       icon = Icons.mic_none;
                       color = Colors.grey;
-                      text = 'في انتظارك...';
+                      text = 'جاهز للاستماع...';
                       break;
                     case AssistantStatus.listening:
                       icon = Icons.mic;
-                      color = Colors.blue;
-                      text = 'يستمع الآن...';
+                      color = Colors.blueAccent;
+                      text = 'أتسمعك بوضوح...';
                       break;
                     case AssistantStatus.thinking:
                       icon = Icons.memory;
                       color = Colors.orange;
-                      text = 'يفكر...';
+                      text = 'أفكر...';
                       break;
                     case AssistantStatus.executing:
                       icon = Icons.settings_applications;
                       color = Colors.green;
-                      text = 'ينفذ المهمة...';
+                      text = 'أنفذ الأمر...';
                       break;
                     case AssistantStatus.speaking:
                       icon = Icons.volume_up;
                       color = Colors.purple;
-                      text = 'يتحدث...';
+                      text = 'أتحدث...';
                       break;
                     case AssistantStatus.error:
                       icon = Icons.error_outline;
                       color = Colors.red;
-                      text = 'حدث خطأ!';
+                      text = state.errorMessage ?? 'حدث خطأ!';
                       break;
                   }
 
                   return Column(
                     children: [
-                      Icon(icon, size: 100, color: color),
-                      const SizedBox(height: 16),
+                      // زر الميكروفون (اضغط مطولاً للتحدث)
+                      GestureDetector(
+                        onTapDown: (_) => context.read<VoiceAssistantCubit>().startListening(),
+                        onTapUp: (_) => context.read<VoiceAssistantCubit>().stopListening(),
+                        onTapCancel: () => context.read<VoiceAssistantCubit>().stopListening(),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          padding: EdgeInsets.all(state.status == AssistantStatus.listening ? 40 : 30),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: color.withOpacity(0.2),
+                            border: Border.all(color: color, width: 3),
+                            boxShadow: state.status == AssistantStatus.listening
+                                ? [BoxShadow(color: color.withOpacity(0.5), blurRadius: 20, spreadRadius: 10)]
+                                : [],
+                          ),
+                          child: Icon(icon, size: 80, color: color),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
                       Text(
                         text,
                         style: TextStyle(fontSize: 24, color: color, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        '(اضغط مطولاً على الدائرة للتحدث)',
+                        style: TextStyle(color: Colors.grey, fontSize: 14),
                       ),
                     ],
                   );
                 },
               ),
-              const SizedBox(height: 50),
+              const SizedBox(height: 60),
               
-              // حقل نصي لتجربة الأوامر (مثل: افتح المفكرة واكتب مرحبا)
+              // الحقل النصي للتجربة (في حال عدم الرغبة بالتحدث)
               TextField(
                 controller: controller,
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                  hintText: 'اكتب أمرك هنا للتجربة...',
+                  hintText: 'أو اكتب أمرك هنا...',
                   hintStyle: const TextStyle(color: Colors.grey),
                   filled: true,
                   fillColor: Colors.grey[800],
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.send, color: Colors.blue),
+                    onPressed: () {
+                      context.read<VoiceAssistantCubit>().submitCommand(controller.text);
+                      controller.clear();
+                    },
+                  ),
                 ),
                 onSubmitted: (value) {
                   context.read<VoiceAssistantCubit>().submitCommand(value);
                   controller.clear();
                 },
-              ),
-              const SizedBox(height: 16),
-              
-              // أزرار التحكم
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      context.read<VoiceAssistantCubit>().submitCommand(controller.text);
-                      controller.clear();
-                    },
-                    icon: const Icon(Icons.send),
-                    label: const Text('إرسال الأمر'),
-                  ),
-                  const SizedBox(width: 16),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      context.read<VoiceAssistantCubit>().testSpeech('مرحباً، أنا المساعد بيكن، كيف يمكنني مساعدتك اليوم؟');
-                    },
-                    icon: const Icon(Icons.speaker),
-                    label: const Text('تجربة النطق'),
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.purple),
-                  ),
-                ],
               ),
             ],
           ),

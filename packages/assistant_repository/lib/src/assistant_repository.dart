@@ -23,6 +23,10 @@ class AssistantRepository {
   final TtsService _ttsService;
   final SttService _sttService;
 
+  // 👉 هنا قمنا بإضافة Getters للسماح للـ Cubit بالوصول للخدمات الصوتية 
+  SttService get sttService => _sttService;
+  TtsService get ttsService => _ttsService;
+
   /// دالة التحدث مع المستخدم
   Future<void> speak(String text) async {
     await _ttsService.speak(text);
@@ -86,6 +90,32 @@ class AssistantRepository {
       case ActionType.unknown:
       default:
         print('إجراء غير معروف: ${action.parameters}');
+    }
+  }
+
+  /// الدالة التي تأخذ مسار الملف الصوتي وتنفذ الأوامر
+  Future<void> executeAudioCommand(String audioPath) async {
+    try {
+      await speak('جاري المعالجة.');
+
+      // إرسال الصوت لـ Gemini
+      final actions = await _aiClient.processAudioCommand(audioPath);
+
+      if (actions.isEmpty) {
+        await speak('لم أتمكن من فهم أمر محدد للتنفيذ.');
+        return;
+      }
+
+      // تنفيذ الأفعال
+      for (final action in actions) {
+        await _executeAction(action);
+        await Future.delayed(const Duration(milliseconds: 500));
+      }
+
+      await speak('تم التنفيذ.');
+    } catch (e) {
+      await speak('عذراً، حدث خطأ أثناء معالجة الصوت.');
+      print('Error executing audio command: $e');
     }
   }
 }
