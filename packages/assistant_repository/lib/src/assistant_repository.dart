@@ -69,6 +69,14 @@ class AssistantRepository {
         }
         break;
 
+      case ActionType.openUrl:
+        final url = action.parameters['url'] as String?;
+        if (url != null) {
+          await _processManager.openUrl(url);
+          await Future.delayed(const Duration(seconds: 2));
+        }
+        break;
+
       case ActionType.typeText:
         final text = action.parameters['text'] as String?;
         if (text != null) {

@@ -3,6 +3,7 @@
 /// أنواع الأوامر التي يمكن للذكاء الاصطناعي تنفيذها على اللابتوب
 enum ActionType {
   openApp,
+  openUrl, // 👈 أضف هذا
   typeText,
   pressKey,
   unknown

@@ -22,11 +22,43 @@ class KeyboardController {
   void pressTab() {
     _sendVirtualKey(VK_TAB);
   }
-  
+
   /// محاكاة الضغط على زر الويندوز (Windows Key)
   void pressWindowsKey() {
     _sendVirtualKey(VK_LWIN);
   }
+
+  /// محاكاة الضغط على مفتاحين معاً (مثل Ctrl + Key)
+  void pressCombination(int modifier, int key) {
+    final inputs = calloc<INPUT>(4);
+
+    // 1. الضغط على المفتاح المساعد (مثل Ctrl)
+    inputs[0].type = INPUT_KEYBOARD;
+    inputs[0].ki.wVk = VIRTUAL_KEY(modifier);
+
+    // 2. الضغط على المفتاح الرئيسي
+    inputs[1].type = INPUT_KEYBOARD;
+    inputs[1].ki.wVk = VIRTUAL_KEY(key);
+
+    // 3. رفع المفتاح الرئيسي
+    inputs[2].type = INPUT_KEYBOARD;
+    inputs[2].ki.wVk = VIRTUAL_KEY(key);
+    inputs[2].ki.dwFlags = KEYEVENTF_KEYUP;
+
+    // 4. رفع المفتاح المساعد
+    inputs[3].type = INPUT_KEYBOARD;
+    inputs[3].ki.wVk = VIRTUAL_KEY(modifier);
+    inputs[3].ki.dwFlags = KEYEVENTF_KEYUP;
+
+    SendInput(4, inputs, sizeOf<INPUT>());
+    free(inputs);
+  }
+
+  /// فتح تبويب جديد (Ctrl + T)
+  void pressCtrlT() => pressCombination(VK_CONTROL, 0x54); // 0x54 هو حرف T
+
+  /// الانتقال لشريط العنوان في المتصفح (Ctrl + L)
+  void pressCtrlL() => pressCombination(VK_CONTROL, 0x4C); // 0x4C هو حرف L
 
   /// دالة داخلية لإرسال أحرف النصوص باستخدام تقنية Unicode
   void _sendUnicodeChar(int charCode) {
@@ -47,17 +79,16 @@ class KeyboardController {
   }
 
   /// دالة داخلية للضغط على أزرار النظام (Virtual Keys)
-  /// لاحظ أننا نمرر VIRTUAL_KEY بدلاً من int
-  void _sendVirtualKey(VIRTUAL_KEY keyCode) {
+  void _sendVirtualKey(int keyCode) {
     final inputs = calloc<INPUT>(2);
 
     // Key Down
     inputs[0].type = INPUT_KEYBOARD;
-    inputs[0].ki.wVk = keyCode;
+    inputs[0].ki.wVk = VIRTUAL_KEY(keyCode);
 
     // Key Up
     inputs[1].type = INPUT_KEYBOARD;
-    inputs[1].ki.wVk = keyCode;
+    inputs[1].ki.wVk = VIRTUAL_KEY(keyCode);
     inputs[1].ki.dwFlags = KEYEVENTF_KEYUP;
 
     SendInput(2, inputs, sizeOf<INPUT>());

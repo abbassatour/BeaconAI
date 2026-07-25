@@ -8,7 +8,7 @@ import 'models/agent_action.dart';
 class AiAgentClient {
   AiAgentClient({
     required String apiKey,
-    this.model = 'google/gemini-3.5-flash', // يمكنك استخدام أي نموذج متاح في OpenRouter
+    this.model = 'google/gemini-3.5-flash',
   }) : _apiKey = apiKey;
 
   final String _apiKey;
@@ -20,7 +20,7 @@ class AiAgentClient {
   Future<List<AgentAction>> processUserCommand(String prompt) async {
     final body = {
       'model': model,
-      'max_tokens': 1000, 
+      'max_tokens': 1000,
       'messages': [
         {
           'role': 'system',
@@ -45,7 +45,7 @@ class AiAgentClient {
 
     final body = {
       'model': model,
-      'max_tokens': 1000, 
+      'max_tokens': 1000,
       'messages': [
         {
           'role': 'system',
@@ -117,6 +117,9 @@ class AiAgentClient {
           case 'open_app':
             actions.add(AgentAction(type: ActionType.openApp, parameters: args));
             break;
+          case 'open_url':
+            actions.add(AgentAction(type: ActionType.openUrl, parameters: args));
+            break;
           case 'type_text':
             actions.add(AgentAction(type: ActionType.typeText, parameters: args));
             break;
@@ -149,6 +152,23 @@ class AiAgentClient {
               }
             },
             'required': ['app_name']
+          }
+        }
+      },
+      {
+        'type': 'function',
+        'function': {
+          'name': 'open_url',
+          'description': 'يفتح رابطاً أو موقعاً إلكترونياً في المتصفح الافتراضي.',
+          'parameters': {
+            'type': 'object',
+            'properties': {
+              'url': {
+                'type': 'string',
+                'description': 'الرابط الكامل للموقع (مثل https://youtube.com أو https://google.com)'
+              }
+            },
+            'required': ['url']
           }
         }
       },
